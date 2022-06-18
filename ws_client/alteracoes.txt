@@ -1,0 +1,11 @@
+P: Os indivíduos estavam passando muito tempo parados sem fazerem nada.
+S: A cada período de tempo a nave com menor fitness é destruída
+
+P: As naves estavam atirando com uma frequência muito alta.
+S: Balas tem limite e demora para recarregar, uma bala a cada meio segundo.
+
+P: As naves ficavam paradas atirando fazendo pontos
+S: Alguns inimigos variam entre se mover pouco para direita e esquerda
+
+P: Foram separados 5 pontos onde os inimigos poderiam nascer, a IA estava deslocando as naves para esses cincos pontos.
+S: Gerando um aleatório melhor.
