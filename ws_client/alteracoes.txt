@@ -7,5 +7,18 @@ S: Balas tem limite e demora para recarregar, uma bala a cada meio segundo.
 P: As naves ficavam paradas atirando fazendo pontos
 S: Alguns inimigos variam entre se mover pouco para direita e esquerda
 
-P: Foram separados 5 pontos onde os inimigos poderiam nascer, a IA estava deslocando as naves para esses cincos pontos.
+P: Foram separados 5 pontos onde os inimigos poderiam nascer, a IA estava deslocando as naves para esses cinco pontos.
 S: Gerando um aleatório melhor.
+
+P: A nave que tava sendo considerada melhor era a que estava atrás das outras naves, as naves da frente matavam os inimigos primeiro, 
+porem as naves de trás viviam por mais tempo; (O mais medroso é o melhor, chega ta tremendo kkkkkkk)
+S: Da mais pontos para quem destrói naves inimigas
+
+P: IA não aprendia. 
+S: Mudar estrutura da rede de 4 entrada e 5 saídas, para 4 entradas, 8 segunda camada, 5 saídas.
+
+P: Uma nave tava atrapalhando a outra de aprender
+S: Coloquei apenas uma nave para jogar por vez.
+
+P: Nave ficava o tempo todo no top atirando e nunca morria.
+S: Tempo 40 seg destruir a nave

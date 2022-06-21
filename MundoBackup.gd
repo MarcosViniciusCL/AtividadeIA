@@ -3,35 +3,41 @@ extends Node2D
 const PORT = 9080
 var _server = WebSocketServer.new()
 
+var Laser = preload("res://projectiles/PlayerLaser.tscn")
+var Player = preload("res://characters/player/Player.tscn")
 var PlayerNovo = preload("res://characters/player/PlayerNovo.tscn")
 
-var id_client = -1
+var id_client = 1
 var players = []
 var geracao = -1
-var prox_coluna = null
 
+func _on_Player_spawn_laser(location, id_player):
+	var l = Laser.instance()
+	l.set_id_player(id_player)
+	l.global_position = location
+	add_child(l)
+
+func shoot_laser(location, id_player):
+	var l = Laser.instance()
+	l.set_id_player(id_player)
+	l.global_position = location
+	add_child(l)
 
 func criar_player(id):
 	var p = PlayerNovo.instance()
-	p.global_position = Vector2(270,750)
+	p.global_position = Vector2(270, 650)
 	p.set_id(id)
 	players.append(p)
 	add_child(p)
 
 func mover_player(id, mov):
-	if(players[id] != null and weakref(players[id]).get_ref()):
+	if(players[id] != null and weakref(players[id]).get_ref()):	
 		players[id].mover(mov)
 	
 func pontos_player(id, pontos):
 	if(len(players) > id  and players[id] != null and weakref(players[id]).get_ref()):
 		players[id].fitness += pontos
 		players[id].enemies_dead_per_time += 1
-		
-func pontos_vivos():
-	for player in players:
-		if player != null and weakref(player).get_ref()  and player.vivo:
-			player.fitness += 10
-			pass
 
 func _physics_process(delta):
 	$Label.text = "IA DESCONECTADA" if id_client == -1 else "Geracao: " + str(geracao)
@@ -39,7 +45,7 @@ func _physics_process(delta):
 func _ready():
 	#Engine.time_scale = 10
 	$Label2.text = "FITNESS: "
-	#criar_player(0)
+	criar_player(0)
 	_server.connect("client_connected", self, "_connected")
 	_server.connect("client_disconnected", self, "_disconnected")
 	_server.connect("client_close_request", self, "_close_request")
@@ -71,9 +77,10 @@ func _on_data(id):
 	
 	if "create" in msg:
 		var el_id = int(msg.split(":")[1])
-		$EnemySpawner.kill_all()
+		$Timer.wait_time = 40
 		$EnemySpawner.speed = 150
-		$EnemySpawner.wait_time = 4
+		$EnemySpawner.wait_time = 1
+		$EnemySpawner.kill_all()
 		criar_player(el_id)
 	elif "restart" in msg:
 		geracao += 1
@@ -91,7 +98,6 @@ func restart_all():
 			if(player != null and weakref(player).get_ref()):
 				player.free()
 	players = []
-	$EnemySpawner.kill_all()
 	$EnemySpawner.speed = 150
 	$EnemySpawner.wait_time = 1
 	
@@ -112,9 +118,9 @@ func show_fitness(valor):
 func _on_Timer_timeout():
 	var player_menor = null
 	for player in players:
+		if player_menor == null and weakref(player).get_ref():
+			player_menor = player
 		if player != null and weakref(player).get_ref() and player.fitness < player_menor.fitness and player.vivo:
-			#var msg  = player.get_id() + ":" + player.get_position() + ":" + player.
-			#notificar()
-			pass
+			player_menor = player
 	if player_menor != null and weakref(player_menor).get_ref():
 		player_menor.take_damage(3)

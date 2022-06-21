@@ -9,7 +9,7 @@ func _physics_process(delta):
 func _on_PlayerLaser_area_entered(area):
 	if area.is_in_group("enemies"):
 		area.take_damage(1)
-		get_node("/root/Mundo").pontos_player(id_player, 5)
+		get_node("/root/Mundo").pontos_player(id_player, 10)
 		queue_free()
 
 

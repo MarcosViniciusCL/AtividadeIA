@@ -7,6 +7,7 @@ signal colisao_posicao(location)
 
 var hp = 1
 var direcao = -2
+var player = null
 
 func _ready():
 	direcao  = randi() % 3
@@ -30,12 +31,24 @@ func get_position():
 
 func kill():
 	queue_free()
+	
+
 
 func _on_Enemy_area_entered(area):
-	if area is Player and area.global_position.distance_to(global_position) < 100:
-		area.take_damage(1)
-	emit_signal("colisao_posicao", global_position)
+	if area is Player:
+		player = area
+	# emit_signal("colisao_posicao", global_position)
 
 
 func _on_VisibilityNotifier2D_screen_exited():
 	queue_free()
+
+
+func _on_Timer_timeout():
+	var dist
+	if(player != null and weakref(player).get_ref()):
+		dist = global_position.distance_to(player.get_position())
+	
+		if dist < 80:
+			player.take_damage(1)
+			take_damage(1)

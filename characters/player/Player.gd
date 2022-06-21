@@ -18,7 +18,7 @@ var speed = 300
 
 var input_vector = Vector2.ZERO
 
-var hp = 3
+var hp = 1
 
 var id_ind = 0
 
@@ -30,6 +30,10 @@ var enemies_dead_per_time = 0
 var shoot_count = 0
 
 var quant_balas = 100
+var dist_esq = 999
+var dist_dir = 999
+var dist_cima = 999
+var dist_baixo = 999
 
 func _physics_process(delta):
 	input_vector.x = Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
@@ -50,11 +54,16 @@ func _physics_process(delta):
 	global_position.y =  tela[1] if global_position.y > tela[1] else global_position.y
 	global_position.y =  40 if global_position.y < 40 else global_position.y
 	
+	dist_esq = global_position.x - 40
+	dist_dir = tela[0] - global_position.x
+	dist_cima = global_position.y - 40
+	dist_baixo = tela[1] - global_position.y
+	
 	
 func take_damage(damage):
 	hp -= damage
 	if hp <= 0:
-		fitness -= 2
+		fitness -= 15
 		vivo = 0
 		notificar_dados()
 		queue_free()
@@ -88,12 +97,24 @@ func get_position():
 
 # Servidor WS #
 func _ready():
+	
 	pass
 
 
 func notificar_dados():
 	var sen = str(sensor[0]) + "," + str(sensor[1]) + "," + str(sensor[2])
-	get_node("/root/Mundo").notificar(str(id_ind) + ":" + sen + ":" + str(fitness) + ":" + str(borda) + ":"+str(vivo))
+	var msg = str(id_ind) + ":"\
+		+ sen + ":"\
+		+ str(fitness) + ":"\
+		+ str(dist_esq) + ":"\
+		+ str(dist_dir) + ":"\
+		+ str(dist_cima) + ":"\
+		+ str(dist_baixo) + ":"\
+		+ str(vivo)
+
+	get_node("/root/Mundo").notificar(msg)
+	# fitness = 0
+	get_node("/root/Mundo").show_fitness(fitness)
 
 func mover(mov):
 	if mov == "md":
@@ -106,6 +127,7 @@ func mover(mov):
 		global_position.y += 5
 	elif mov == "at":
 		shoot_laser()
+		pass
 		
 
 func _on_TimeSensores_timeout():
@@ -122,18 +144,23 @@ func _on_TimeSensores_timeout():
 		dist2 = global_position.distance_to(obj_enemies[2].get_position())
 	sensor = [dist0, dist1, dist2]
 	
-	if dist0 < 80:
-		obj_enemies[0].take_damage(1)
-		take_damage(1)
-	if dist1 < 80:
-		obj_enemies[1].take_damage(1)
-		take_damage(1)	
-	if dist2 < 80:
-		obj_enemies[2].take_damage(1)
-		take_damage(1)
+	#if dist0 < 80:
+	#	obj_enemies[0].take_damage(1)
+	#	take_damage(1)
+	#if dist1 < 80:
+	#	obj_enemies[1].take_damage(1)
+	#	take_damage(1)	
+	#if dist2 < 80:
+	#	obj_enemies[2].take_damage(1)
+	#	take_damage(1)
 			
-	fitness += 0.1
+	#fitness += 0.01
+	
+	#if dist_baixo < 40 or dist_cima < 40 or dist_esq < 40 or dist_dir < 40:
+	#	fitness -=0.5
+	
 	notificar_dados()
+	fitness = 0 if fitness < 0 else fitness
 
 	obj_enemies[0] = obj_enemies[0] if dist0 < 300 else null
 	obj_enemies[1] = obj_enemies[1] if dist1 < 300 else null
@@ -147,8 +174,8 @@ func get_id():
 
 
 func _on_TimerRecargaBalas_timeout():
-	if quant_balas == 0:
-		fitness -= 2
+	#if quant_balas == 0:
+	#	fitness -= 10
 	if quant_balas < 50:
 		quant_balas += 1
 	

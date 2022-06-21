@@ -1,3 +1,4 @@
+import pickle
 import threading
 import websocket
 import _thread
@@ -10,6 +11,10 @@ redes = []
 lista_genomas = []
 naves = []
 
+genoma_geracao = None
+rede_geracao = None
+genoma_geral = None
+rede_geral = None
     
 
 def ativar( id, sensor, fitness, vivo):
@@ -17,7 +22,10 @@ def ativar( id, sensor, fitness, vivo):
     output = redes[id].activate(sensor)
     if not vivo:
         naves.remove(id)
-        print("Nave " + str(id) + " destruída")
+        # print("Nave " + str(id) + " destruída")
+    # if (genoma_geral == None or genoma_geral.fitness < fitness):
+    #     genoma_geral = lista_genomas[id]
+    #     rede_geral = redes[id]
     return output
 
 def on_message(ws, message):
@@ -26,21 +34,21 @@ def on_message(ws, message):
 
     o = msg.split(":")
     id = int(o[0])
-    sensor = o[1].split(",")
-    sensor = [float(i) for i in sensor]
-    fitness = float(o[2])
-    sensor.append(float(o[3]))
-    vivo = o[4] == "1"
+    fitness = float(o[1])
+    vivo = o[2] == "1"
+    fenda_esq = float(o[3])
+    fenda_dir = float(o[4])
+    dist_esq = float(o[5])
 
-    output = ativar(id, sensor, fitness, vivo)
+    output = ativar(id, [fenda_esq, fenda_dir, dist_esq], fitness, vivo)
     
     md = "md" if output[0] > 0.5 else ""
     me = "me" if output[1] > 0.5 else ""
-    mc = "mc" if output[2] > 0.5 else ""
-    mb = "mb" if output[3] > 0.5 else ""
-    at = "at" if output[4] > 0.5 else ""
+    # mc = "mc" if output[2] > 0.5 else ""
+    # mb = "mb" if output[3] > 0.5 else ""
+    # at = "" #"at" if output[4] > 0.5 else ""
 
-    env = [md, me, mc, mb, at]
+    env = [md, me]
     for i in env:
         if i != "":
             send_msg(str(id) + ":" + i)
@@ -63,8 +71,9 @@ def criar_nave(id):
 
 def main(genomes, config):
     send_msg("restart")
-    # lista_genomas = []
-    # redes = []
+    lista_genomas.clear()
+    redes.clear()
+    naves.clear()
     index = 0
     for _, genome in genomes:
         redes.append(neat.nn.FeedForwardNetwork.create(genome, config))
@@ -72,6 +81,7 @@ def main(genomes, config):
         lista_genomas.append(genome)
         naves.append(index)
         criar_nave(index)
+        #print(genome)
         index += 1
     while len(naves) > 0:
         time.sleep(0.1)
@@ -83,7 +93,22 @@ def conectar(n):
     populacao = neat.Population(config)
     populacao.add_reporter(neat.StdOutReporter(True))
     populacao.add_reporter(neat.StatisticsReporter())
-    populacao.run(main, 50)
+    
+    vencedor = populacao.run(main)
+    with open("winner.pkl", "wb") as f:
+        pickle.dump(vencedor, f)
+        f.close()
+
+    lista_genomas.clear()
+    redes.clear()
+    naves.clear()
+    redes.append(neat.nn.FeedForwardNetwork.create(vencedor, config))
+    lista_genomas.append(vencedor)
+    naves.append(vencedor)
+    while len(naves) > 0:
+        time.sleep(0.1)
+
+
    
 
 if __name__ == "__main__":

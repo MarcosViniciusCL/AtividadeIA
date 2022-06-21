@@ -13,9 +13,15 @@ _global_script_classes=[ {
 "class": "Player",
 "language": "GDScript",
 "path": "res://characters/player/Player.gd"
+}, {
+"base": "Area2D",
+"class": "PlayerNovo",
+"language": "GDScript",
+"path": "res://characters/player/PlayerNovo.gd"
 } ]
 _global_script_class_icons={
-"Player": ""
+"Player": "",
+"PlayerNovo": ""
 }
 
 [application]

@@ -1,10 +1,10 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://assets/playerShip1_red.png" type="Texture" id=1]
-[ext_resource path="res://characters/player/Player.gd" type="Script" id=2]
+[ext_resource path="res://characters/player/PlayerNovo.gd" type="Script" id=2]
 
-[sub_resource type="CircleShape2D" id=1]
-radius = 208.002
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 162, 368 )
 
 [node name="Player" type="Area2D" groups=["laser"]]
 collision_layer = 2
@@ -19,6 +19,7 @@ texture = ExtResource( 1 )
 position = Vector2( 0, -60 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 4, -288 )
 shape = SubResource( 1 )
 
 [node name="TimeSensores" type="Timer" parent="." groups=["players"]]
